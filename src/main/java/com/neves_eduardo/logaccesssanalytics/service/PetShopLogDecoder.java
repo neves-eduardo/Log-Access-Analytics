@@ -12,7 +12,7 @@ public class PetShopLogDecoder implements LogDecoder {
     private static final int UUID_INDEX = 2;
     private static final int REGION_INDEX = 3;
 
-
+    @Override
     public Log decodeLog(String logText) {
         String[] logAttributes = logText.split("\\s+");
 
