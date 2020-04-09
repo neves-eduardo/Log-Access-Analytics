@@ -7,13 +7,15 @@ import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.BatchPoints;
 import org.influxdb.dto.Point;
+import org.influxdb.dto.Query;
+import org.influxdb.dto.QueryResult;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
-public class PetShopPublisher implements Publisher {
+public class PetShopDatabaseDAO implements DatabaseDAO {
     private String influxURL;
     private String influxUser;
     private String influxPassword;
@@ -21,7 +23,7 @@ public class PetShopPublisher implements Publisher {
     private String influxLogMeasurement;
     private static final String CONFIG_FILE_PATH = "src/main/resources/config.properties";
 
-    public PetShopPublisher() {
+    public PetShopDatabaseDAO() {
         this.loadProperties();
     }
 
@@ -64,5 +66,14 @@ public class PetShopPublisher implements Publisher {
         }
         influxDB.close();
         return null;
+    }
+
+    @Override
+    public QueryResult query(Query query) {
+        InfluxDB influxDB = InfluxDBFactory.connect(influxURL, influxUser, influxPassword);
+        influxDB.setDatabase(influxDataBase);
+        QueryResult queryResult =influxDB.query(query);
+        influxDB.close();
+        return queryResult;
     }
 }
