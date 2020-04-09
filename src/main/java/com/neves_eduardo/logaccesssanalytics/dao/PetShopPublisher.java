@@ -2,6 +2,7 @@ package com.neves_eduardo.logaccesssanalytics.dao;
 
 import com.neves_eduardo.logaccesssanalytics.dto.Log;
 import com.neves_eduardo.logaccesssanalytics.exception.CannotLoadConfigsException;
+import com.neves_eduardo.logaccesssanalytics.exception.DatabaseConnectionException;
 import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.BatchPoints;
@@ -59,7 +60,7 @@ public class PetShopPublisher implements Publisher {
             batchPoints.point(point);
             influxDB.write(batchPoints);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            throw new DatabaseConnectionException(e.getMessage());
         }
         influxDB.close();
         return null;
