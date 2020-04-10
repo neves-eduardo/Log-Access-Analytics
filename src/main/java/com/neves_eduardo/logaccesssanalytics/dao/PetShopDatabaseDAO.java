@@ -76,4 +76,5 @@ public class PetShopDatabaseDAO implements DatabaseDAO {
         influxDB.close();
         return queryResult;
     }
+
 }
