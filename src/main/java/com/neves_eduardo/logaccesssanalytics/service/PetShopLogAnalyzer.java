@@ -6,7 +6,7 @@ import java.util.*;
 import static java.util.stream.Collectors.toMap;
 
 
-public class PetShopLogAnalyzer implements LogAnalyzer{
+public class PetShopLogAnalyzer{
     private final DatabaseDAO databaseDAO;
 
     public PetShopLogAnalyzer(DatabaseDAO databaseDAO) {
