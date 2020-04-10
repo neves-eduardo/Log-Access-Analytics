@@ -4,8 +4,12 @@ import com.neves_eduardo.logaccesssanalytics.dto.Log;
 import org.influxdb.dto.Query;
 import org.influxdb.dto.QueryResult;
 
+import java.util.Map;
+
 public interface DatabaseDAO {
     void loadProperties();
     Log publish(Log log);
-    QueryResult query(Query query);
+    Map<String,Double> getAccessesByURL();
+    Map<String,Double> getAccessesByURL(Integer region);
+    Map<String,Double> getAccessesByURL(Long timestamp);
 }
