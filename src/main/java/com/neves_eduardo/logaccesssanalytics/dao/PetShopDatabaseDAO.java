@@ -9,11 +9,18 @@ import org.influxdb.dto.BatchPoints;
 import org.influxdb.dto.Point;
 import org.influxdb.dto.Query;
 import org.influxdb.dto.QueryResult;
+import org.influxdb.querybuilder.time.DurationLiteral;
+import org.msgpack.core.annotations.Nullable;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Properties;
+import java.net.URL;
+import java.sql.Timestamp;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
+
+import static org.influxdb.querybuilder.BuiltQuery.QueryBuilder.*;
+import static org.influxdb.querybuilder.time.DurationLiteral.*;
 
 public class PetShopDatabaseDAO implements DatabaseDAO {
     private String influxURL;
@@ -68,7 +75,6 @@ public class PetShopDatabaseDAO implements DatabaseDAO {
         return null;
     }
 
-    @Override
     public QueryResult query(Query query) {
         InfluxDB influxDB = InfluxDBFactory.connect(influxURL, influxUser, influxPassword);
         influxDB.setDatabase(influxDataBase);
@@ -77,4 +83,36 @@ public class PetShopDatabaseDAO implements DatabaseDAO {
         return queryResult;
     }
 
+    public Map<String,Double> getAccessesByURL() {
+        Query query = select().count("value").from(influxDataBase,influxLogMeasurement).groupBy("URL");
+        return mapEntries(query);
+    }
+
+    public Map<String,Double> getAccessesByURL(Integer region) {
+        Query query = select().count("value").from(influxDataBase,influxLogMeasurement).where(eq("Region",Integer.toString(region))).groupBy("URL");
+        return mapEntries(query);
+    }
+
+    public Map<String,Double> getAccessesByURL(Long timestamp) {
+        Query query = select().count("value").from(influxDataBase,influxLogMeasurement)
+                .where()
+                .and(gte("time",ti(System.currentTimeMillis() - timestamp,MILLISECONDS)))
+                .and(lte("time",ti(System.currentTimeMillis(),MILLISECONDS))).groupBy("URL");
+        return mapEntries(query);
+    }
+    private Map<String,Double> mapEntries(Query query) {
+        InfluxDB influxDB = InfluxDBFactory.connect(influxURL, influxUser, influxPassword);
+        QueryResult result = influxDB.query(query,TimeUnit.MILLISECONDS);
+        influxDB.close();
+        List<QueryResult.Series> series = result.getResults().get(0).getSeries();
+        Map<String,Double> urlAccesses = new HashMap<>();
+        if(series == null){return Collections.emptyMap();}
+        for (QueryResult.Series serie: series) {
+            String serieTag = serie.getTags().get("URL");
+            Double count = (Double) serie.getValues().get(0).get(1);
+            urlAccesses.put(serieTag,count);
+        }
+        return urlAccesses;
+
+    }
 }

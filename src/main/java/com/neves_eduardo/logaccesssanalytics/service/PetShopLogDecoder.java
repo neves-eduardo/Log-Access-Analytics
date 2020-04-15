@@ -3,7 +3,9 @@ package com.neves_eduardo.logaccesssanalytics.service;
 import com.neves_eduardo.logaccesssanalytics.dto.Log;
 import com.neves_eduardo.logaccesssanalytics.exception.InvalidLogException;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.influxdb.dto.QueryResult;
 
+import java.util.List;
 import java.util.UUID;
 
 public class PetShopLogDecoder implements LogDecoder {
@@ -34,5 +36,18 @@ public class PetShopLogDecoder implements LogDecoder {
                 Long.parseLong(logAttributes[MILISECONDS_INDEX]),
                 UUID.fromString(logAttributes[UUID_INDEX]),
                 Integer.parseInt(logAttributes[REGION_INDEX]));
+    }
+
+    @Override
+    public List<Log> decodeLogs(QueryResult queryResult) {
+        List<QueryResult.Result> results = queryResult.getResults();
+        if(queryResult.getError() != null) throw new InvalidLogException("Error in query");
+        if(queryResult.getResults().isEmpty()) throw new InvalidLogException("Result set empty");
+        for (QueryResult.Result result:queryResult.getResults()) {
+            //TODO DECODING TO LOG DTO
+        }
+
+
+        return null;
     }
 }
