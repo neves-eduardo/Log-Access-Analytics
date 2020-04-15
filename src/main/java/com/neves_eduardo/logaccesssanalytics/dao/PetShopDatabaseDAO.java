@@ -16,10 +16,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static org.influxdb.querybuilder.BuiltQuery.QueryBuilder.*;
@@ -109,7 +106,7 @@ public class PetShopDatabaseDAO implements DatabaseDAO {
         influxDB.close();
         List<QueryResult.Series> series = result.getResults().get(0).getSeries();
         Map<String,Double> urlAccesses = new HashMap<>();
-
+        if(series == null){return Collections.emptyMap();}
         for (QueryResult.Series serie: series) {
             String serieTag = serie.getTags().get("URL");
             Double count = (Double) serie.getValues().get(0).get(1);
