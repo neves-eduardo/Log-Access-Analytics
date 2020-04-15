@@ -13,7 +13,7 @@ public class PetShopLogAnalyzer{
         this.databaseDAO = databaseDAO;
     }
 
-    public void analyzeLog (Log log) {
+    public void publishLog(Log log) {
         databaseDAO.publish(log);
     }
 
