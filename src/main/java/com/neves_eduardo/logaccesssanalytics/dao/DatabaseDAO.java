@@ -8,8 +8,9 @@ import java.util.Map;
 
 public interface DatabaseDAO {
     void loadProperties();
-    Log publish(Log log);
+    void publish(Log log);
     Map<String,Double> getAccessesByURL();
     Map<String,Double> getAccessesByURL(Integer region);
     Map<String,Double> getAccessesByURL(Long timestamp);
+    Map<Double,Double> getAccessesByURLByTime(Long groupByValueInSeconds);
 }

@@ -37,7 +37,10 @@ public class PetShopLogAnalyzer{
         return sortAccessesAscendingOrder(limit,urlAccesses);
     }
 
-
+    public Map<Double,Double> mostAccessedMoment (int limit,Long groupByValueInSeconds) {
+        Map<Double,Double> urlAccesses = databaseDAO.getAccessesByURLByTime(groupByValueInSeconds);
+        return sortAccessesByTimeDescendingOrder(limit,urlAccesses);
+    }
 
     private Map<String,Double> sortAccessesDescendingOrder (int limit, Map<String,Double> urlAccesses) {
         return urlAccesses.entrySet()
@@ -58,4 +61,17 @@ public class PetShopLogAnalyzer{
                         toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2,
                                 LinkedHashMap::new));
     }
+
+    private Map<Double,Double> sortAccessesByTimeDescendingOrder (int limit, Map<Double,Double> urlAccesses) {
+        return urlAccesses.entrySet()
+                .stream()
+                .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+                .limit(limit)
+                .collect(
+                        toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2,
+                                LinkedHashMap::new));
+    }
+
+
+
 }

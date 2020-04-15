@@ -9,13 +9,9 @@ import org.influxdb.dto.BatchPoints;
 import org.influxdb.dto.Point;
 import org.influxdb.dto.Query;
 import org.influxdb.dto.QueryResult;
-import org.influxdb.querybuilder.time.DurationLiteral;
-import org.msgpack.core.annotations.Nullable;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URL;
-import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -53,7 +49,7 @@ public class PetShopDatabaseDAO implements DatabaseDAO {
     }
 
     @Override
-    public Log publish(Log log) {
+    public void publish(Log log) {
         InfluxDB influxDB = InfluxDBFactory.connect(influxURL, influxUser, influxPassword);
         try {
             BatchPoints batchPoints = BatchPoints.database(influxDataBase).build();
@@ -72,25 +68,16 @@ public class PetShopDatabaseDAO implements DatabaseDAO {
             throw new DatabaseConnectionException(e.getMessage());
         }
         influxDB.close();
-        return null;
-    }
-
-    public QueryResult query(Query query) {
-        InfluxDB influxDB = InfluxDBFactory.connect(influxURL, influxUser, influxPassword);
-        influxDB.setDatabase(influxDataBase);
-        QueryResult queryResult =influxDB.query(query);
-        influxDB.close();
-        return queryResult;
     }
 
     public Map<String,Double> getAccessesByURL() {
         Query query = select().count("value").from(influxDataBase,influxLogMeasurement).groupBy("URL");
-        return mapEntries(query);
+        return mapCountedEntries(query);
     }
 
     public Map<String,Double> getAccessesByURL(Integer region) {
         Query query = select().count("value").from(influxDataBase,influxLogMeasurement).where(eq("Region",Integer.toString(region))).groupBy("URL");
-        return mapEntries(query);
+        return mapCountedEntries(query);
     }
 
     public Map<String,Double> getAccessesByURL(Long timestamp) {
@@ -98,9 +85,16 @@ public class PetShopDatabaseDAO implements DatabaseDAO {
                 .where()
                 .and(gte("time",ti(System.currentTimeMillis() - timestamp,MILLISECONDS)))
                 .and(lte("time",ti(System.currentTimeMillis(),MILLISECONDS))).groupBy("URL");
-        return mapEntries(query);
+        return mapCountedEntries(query);
     }
-    private Map<String,Double> mapEntries(Query query) {
+
+    public Map<Double,Double> getAccessesByURLByTime(Long groupByValueInSeconds) {
+        Query query = select().count("value").from(influxDataBase,influxLogMeasurement)
+                .groupBy(time(groupByValueInSeconds,SECOND));
+        return mapCountedEntriesByTime(query);
+    }
+
+    private Map<String,Double> mapCountedEntries(Query query) {
         InfluxDB influxDB = InfluxDBFactory.connect(influxURL, influxUser, influxPassword);
         QueryResult result = influxDB.query(query,TimeUnit.MILLISECONDS);
         influxDB.close();
@@ -111,6 +105,22 @@ public class PetShopDatabaseDAO implements DatabaseDAO {
             String serieTag = serie.getTags().get("URL");
             Double count = (Double) serie.getValues().get(0).get(1);
             urlAccesses.put(serieTag,count);
+        }
+        return urlAccesses;
+
+    }
+
+    private Map<Double,Double> mapCountedEntriesByTime(Query query) {
+        InfluxDB influxDB = InfluxDBFactory.connect(influxURL, influxUser, influxPassword);
+        QueryResult queryResult = influxDB.query(query,TimeUnit.MILLISECONDS);
+        influxDB.close();
+        List<List<Object>> results =queryResult.getResults().get(0).getSeries().get(0).getValues();
+        Map<Double,Double> urlAccesses = new HashMap<>();
+        if(results == null){return Collections.emptyMap();}
+        for (List<Object>result: results) {
+            Double timestamp = (Double) result.get(0);
+            Double count = (Double) result.get(1);
+           if(count != 0) {urlAccesses.put(timestamp, count);}
         }
         return urlAccesses;
 
