@@ -9,6 +9,7 @@ import org.influxdb.dto.BatchPoints;
 import org.influxdb.dto.Point;
 import org.influxdb.dto.Query;
 import org.influxdb.dto.QueryResult;
+import org.springframework.stereotype.Repository;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -17,14 +18,14 @@ import java.util.concurrent.TimeUnit;
 
 import static org.influxdb.querybuilder.BuiltQuery.QueryBuilder.*;
 import static org.influxdb.querybuilder.time.DurationLiteral.*;
-
+@Repository
 public class PetShopDatabaseDAO implements DatabaseDAO {
     private String influxURL;
     private String influxUser;
     private String influxPassword;
     private String influxDataBase;
     private String influxLogMeasurement;
-    private static final String CONFIG_FILE_PATH = "src/main/resources/config.properties";
+    private static final String CONFIG_FILE_PATH = System.getProperty("user.home")+"/Projetos/LAA/src/main/resources/config.properties";
 
     public PetShopDatabaseDAO() {
         this.loadProperties();
@@ -90,6 +91,8 @@ public class PetShopDatabaseDAO implements DatabaseDAO {
 
     public Map<Double,Double> getAccessesByURLByTime(Long groupByValueInSeconds) {
         Query query = select().count("value").from(influxDataBase,influxLogMeasurement)
+                .where(gte("time",ti(System.currentTimeMillis() - 86400000,MILLISECONDS)))
+                .and(lte("time",ti(System.currentTimeMillis(),MILLISECONDS))).groupBy("URL")
                 .groupBy(time(groupByValueInSeconds,SECOND));
         return mapCountedEntriesByTime(query);
     }
