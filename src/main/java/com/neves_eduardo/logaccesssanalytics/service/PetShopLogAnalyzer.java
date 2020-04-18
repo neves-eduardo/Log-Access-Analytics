@@ -2,10 +2,12 @@ package com.neves_eduardo.logaccesssanalytics.service;
 
 import com.neves_eduardo.logaccesssanalytics.dao.DatabaseDAO;
 import com.neves_eduardo.logaccesssanalytics.dto.Log;
+import org.springframework.stereotype.Service;
+
 import java.util.*;
 import static java.util.stream.Collectors.toMap;
 
-
+@Service
 public class PetShopLogAnalyzer{
     private final DatabaseDAO databaseDAO;
 
