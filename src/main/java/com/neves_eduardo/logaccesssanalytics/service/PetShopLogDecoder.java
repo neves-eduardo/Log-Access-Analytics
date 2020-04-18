@@ -4,18 +4,23 @@ import com.neves_eduardo.logaccesssanalytics.dto.Log;
 import com.neves_eduardo.logaccesssanalytics.exception.InvalidLogException;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.influxdb.dto.QueryResult;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.UUID;
-
+@Component
 public class PetShopLogDecoder implements LogDecoder {
     private static final int URL_INDEX = 0;
     private static final int MILISECONDS_INDEX = 1;
     private static final int UUID_INDEX = 2;
     private static final int REGION_INDEX = 3;
 
+    public PetShopLogDecoder() {
+    }
+
     @Override
     public Log decodeLog(String logText) {
+        logText = logText.replace("\"","");
         String[] logAttributes = logText.split("\\s+");
 
         if (logAttributes.length != 4) {throw new InvalidLogException("Invalid Log Format Input.");}
