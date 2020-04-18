@@ -49,7 +49,6 @@ public class PetShopLogController {
 
     @GetMapping("/metrics/{top}/{region}/{timeUnit}/{duration}")
     public @ResponseBody ResponseEntity getMetrics(@PathVariable Integer top, @PathVariable Integer region, @PathVariable String timeUnit, @PathVariable Long duration) throws JsonProcessingException {
-        System.out.println(TimeUnit.valueOf(timeUnit).toMillis(duration));
         return ResponseEntity.ok().body(objectMapper.writeValueAsString(new MetricsDTO(petShopLogAnalyzer.topURLs(top),
                 petShopLogAnalyzer.topURLs(top,region),
                 petShopLogAnalyzer.bottomURLs(top),
