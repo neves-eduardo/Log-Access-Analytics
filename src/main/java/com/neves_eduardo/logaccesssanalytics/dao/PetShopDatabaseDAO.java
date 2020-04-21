@@ -101,9 +101,9 @@ public class PetShopDatabaseDAO implements DatabaseDAO {
         InfluxDB influxDB = InfluxDBFactory.connect(influxURL, influxUser, influxPassword);
         QueryResult result = influxDB.query(query,TimeUnit.MILLISECONDS);
         influxDB.close();
+        if(result.getResults().get(0).getSeries() == null){return Collections.emptyMap();}
         List<QueryResult.Series> series = result.getResults().get(0).getSeries();
         Map<String,Double> urlAccesses = new HashMap<>();
-        if(series == null){return Collections.emptyMap();}
         for (QueryResult.Series serie: series) {
             String serieTag = serie.getTags().get("URL");
             Double count = (Double) serie.getValues().get(0).get(1);
@@ -117,9 +117,10 @@ public class PetShopDatabaseDAO implements DatabaseDAO {
         InfluxDB influxDB = InfluxDBFactory.connect(influxURL, influxUser, influxPassword);
         QueryResult queryResult = influxDB.query(query,TimeUnit.MILLISECONDS);
         influxDB.close();
+        if(queryResult.getResults().get(0).getSeries() == null){return Collections.emptyMap();}
         List<List<Object>> results =queryResult.getResults().get(0).getSeries().get(0).getValues();
         Map<Double,Double> urlAccesses = new HashMap<>();
-        if(results == null){return Collections.emptyMap();}
+
         for (List<Object>result: results) {
             Double timestamp = (Double) result.get(0);
             Double count = (Double) result.get(1);
