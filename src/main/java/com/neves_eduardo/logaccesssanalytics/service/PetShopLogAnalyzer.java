@@ -21,27 +21,27 @@ public class PetShopLogAnalyzer{
 
     public Map<String,Double> topURLs (int limit) {
         Map<String,Double> urlAccesses = databaseDAO.getAccessesByURL();
-        return sortAccessesDescendingOrder(limit,urlAccesses);
+        if(!urlAccesses.isEmpty()){return sortAccessesDescendingOrder(limit,urlAccesses);} else return Collections.EMPTY_MAP;
     }
 
     public Map<String,Double> topURLs (int limit, int region) {
         Map<String,Double> urlAccesses = databaseDAO.getAccessesByURL(region);
-        return sortAccessesDescendingOrder(limit,urlAccesses);
+        if(!urlAccesses.isEmpty()){return sortAccessesDescendingOrder(limit,urlAccesses);} else return Collections.EMPTY_MAP;
     }
 
     public Map<String,Double> topURLs (int limit, Long millisThreshold) {
         Map<String,Double> urlAccesses = databaseDAO.getAccessesByURL(millisThreshold);
-        return sortAccessesDescendingOrder(limit,urlAccesses);
+        if(!urlAccesses.isEmpty()){return sortAccessesDescendingOrder(limit,urlAccesses);} else return Collections.EMPTY_MAP;
     }
 
     public Map<String,Double> bottomURLs (int limit) {
         Map<String,Double> urlAccesses = databaseDAO.getAccessesByURL();
-        return sortAccessesAscendingOrder(limit,urlAccesses);
+        if(!urlAccesses.isEmpty()){return sortAccessesAscendingOrder(limit,urlAccesses);} else return Collections.EMPTY_MAP;
     }
 
     public Map<Double,Double> mostAccessedMoment (int limit,Long groupByValueInSeconds) {
         Map<Double,Double> urlAccesses = databaseDAO.getAccessesByURLByTime(groupByValueInSeconds);
-        return sortAccessesByTimeDescendingOrder(limit,urlAccesses);
+        if(!urlAccesses.isEmpty()){return sortAccessesByTimeDescendingOrder(limit,urlAccesses);} else return Collections.EMPTY_MAP;
     }
 
     private Map<String,Double> sortAccessesDescendingOrder (int limit, Map<String,Double> urlAccesses) {
