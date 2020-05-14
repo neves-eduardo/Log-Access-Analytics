@@ -55,7 +55,10 @@ public class PetShopLogController {
                 petShopLogAnalyzer.topURLs(top,TimeUnit.valueOf(timeUnit).toMillis(duration)),
                 petShopLogAnalyzer.mostAccessedMoment(top,TimeUnit.valueOf(timeUnit).toMillis(duration)))));
     }
-
+    @GetMapping("/health")
+    public @ResponseBody ResponseEntity healthChecker() {
+        return ResponseEntity.ok().body(null);
+    }
 
 
 }
