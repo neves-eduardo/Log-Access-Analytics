@@ -7,7 +7,6 @@ import org.influxdb.dto.QueryResult;
 import java.util.Map;
 
 public interface DatabaseDAO {
-    void loadProperties();
     void publish(Log log);
     Map<String,Double> getAccessesByURL();
     Map<String,Double> getAccessesByURL(Integer region);

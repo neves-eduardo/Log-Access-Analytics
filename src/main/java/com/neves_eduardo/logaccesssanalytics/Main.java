@@ -1,5 +1,6 @@
 package com.neves_eduardo.logaccesssanalytics;
 
+import com.neves_eduardo.logaccesssanalytics.config.PropertiesReader;
 import com.neves_eduardo.logaccesssanalytics.dto.Log;
 import com.neves_eduardo.logaccesssanalytics.server.JettyServer;
 import org.eclipse.jetty.server.Server;
@@ -20,7 +21,8 @@ public class Main {
         AnnotationConfigWebApplicationContext applicationContext = new AnnotationConfigWebApplicationContext();
         JettyServer jettyServer = new JettyServer();
         applicationContext.setConfigLocation("com.neves_eduardo.logaccesssanalytics.config.AppConfig");
-        Server server = jettyServer.createServer(8888,applicationContext);
+        PropertiesReader propertiesReader = new PropertiesReader();
+        Server server = jettyServer.createServer(Integer.parseInt(propertiesReader.loadProperty("app.port")),applicationContext);
         server.start();
         server.join();
     }

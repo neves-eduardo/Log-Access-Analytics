@@ -1,5 +1,6 @@
 package com.neves_eduardo.logaccesssanalytics.dao;
 
+import com.neves_eduardo.logaccesssanalytics.config.PropertiesReader;
 import com.neves_eduardo.logaccesssanalytics.dto.Log;
 import com.neves_eduardo.logaccesssanalytics.exception.CannotLoadConfigsException;
 import com.neves_eduardo.logaccesssanalytics.exception.DatabaseConnectionException;
@@ -9,6 +10,7 @@ import org.influxdb.dto.BatchPoints;
 import org.influxdb.dto.Point;
 import org.influxdb.dto.Query;
 import org.influxdb.dto.QueryResult;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.io.FileInputStream;
@@ -25,28 +27,16 @@ public class PetShopDatabaseDAO implements DatabaseDAO {
     private String influxPassword;
     private String influxDataBase;
     private String influxLogMeasurement;
-    private static final String CONFIG_FILE_PATH = System.getProperty("user.home")+"/Projetos/LAA/src/main/resources/config.properties";
+    private PropertiesReader propertiesReader;
+    private static final String CONFIG_FILE_PATH = "config.properties";
 
-    public PetShopDatabaseDAO() {
-        this.loadProperties();
-    }
-
-    @Override
-    public void loadProperties() {
-        Properties properties = new Properties();
-        try {
-            FileInputStream fileInputStream = new FileInputStream(CONFIG_FILE_PATH);
-            properties.load(fileInputStream);
-            this.influxURL = properties.getProperty("db.URL");
-            this.influxUser = properties.getProperty("db.username");
-            this.influxPassword = properties.getProperty("db.password");
-            this.influxDataBase = properties.getProperty("db.name");
-            this.influxLogMeasurement = properties.getProperty("db.measurements.petshoplogs");
-
-        } catch (IOException e) {
-            throw new CannotLoadConfigsException("Error loading properties.config file");
-        }
-
+    @Autowired
+    public PetShopDatabaseDAO(PropertiesReader propertiesReader) {
+        this.influxURL = propertiesReader.loadProperty("db.URL");
+        this.influxUser = propertiesReader.loadProperty("db.username");
+        this.influxPassword = propertiesReader.loadProperty("db.password");
+        this.influxDataBase = propertiesReader.loadProperty("db.name");
+        this.influxLogMeasurement= propertiesReader.loadProperty("db.measurements.petshoplogs");
     }
 
     @Override
