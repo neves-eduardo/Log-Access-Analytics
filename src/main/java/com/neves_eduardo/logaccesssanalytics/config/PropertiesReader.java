@@ -9,7 +9,7 @@ import java.util.Properties;
 
 @Component
 public class PropertiesReader {
-    private static final String CONFIG_FILE_PATH = System.getProperty("user.home")+"/config.properties";
+    private static final String CONFIG_FILE_PATH = System.getProperty("configpath");
     private Properties properties;
 
     public PropertiesReader() {
