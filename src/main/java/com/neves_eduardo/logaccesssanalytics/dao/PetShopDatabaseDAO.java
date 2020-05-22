@@ -27,8 +27,7 @@ public class PetShopDatabaseDAO implements DatabaseDAO {
     private String influxPassword;
     private String influxDataBase;
     private String influxLogMeasurement;
-    private PropertiesReader propertiesReader;
-    private static final String CONFIG_FILE_PATH = System.getProperty("user.home")+"config.properties";
+
 
     @Autowired
     public PetShopDatabaseDAO(PropertiesReader propertiesReader) {
