@@ -1,8 +1,0 @@
-[Unit]
-Description=LAA service
-[Service]
-ExecStart=/usr/bin/java -jar /home/ec2-user/LAA.jar
-User=root
-Type=simple
-[Install]
-WantedBy=multi-user.target
