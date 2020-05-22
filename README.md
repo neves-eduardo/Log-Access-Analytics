@@ -59,8 +59,45 @@ After installing the Jenkins plugins, we need to configure our jenkins plugins.
   - Go to "Manage Jenkins" and "Jenkins CLI", download the jenkins-cli .jar.
   - At your local machine cd into the LAA-Infra repo directory. 
   Run the following commands:
-    - java -jar jenkins-cli.jar -s http://{Instance Public DNS}:8080/ -auth admin:{your jenkins secret key} create-job "Build_LAA_App" < Build_LAA_App.xml 
-    - java -jar jenkins-cli.jar -s http://{Instance Public DNS}:8080/ -auth admin:{your jenkins secret key} create-job "Bake LAA Influx" < Bake_LAA_Influx.xml  
-    - java -jar jenkins-cli.jar -s http://{Instance Public DNS}:8080/ -auth admin:{your jenkins secret key} create-job "Bake LAA App" < Bake_LAA_App.xml  
-    - java -jar jenkins-cli.jar -s http://{Instance Public DNS}:8080/ -auth admin:{your jenkins secret key} create-job "Start Influx DB" < Start_Influx_DB.xml 
-    - java -jar jenkins-cli.jar -s http://{Instance Public DNS}:8080/ -auth admin:{your jenkins secret key} create-job "Terraform Infra UP" < Terraform_Infra_UP.xml
+    - java -jar /location/of/jenkins-cli.jar -s http://{Instance Public DNS}:8080/ -auth admin:{your jenkins secret key} create-job "Build_LAA_App" < location/of/repo/JenkinsMachine/jobs/Build_LAA_App.xml 
+    - java -jar /location/of/jenkins-cli.jar -s http://{Instance Public DNS}:8080/ -auth admin:{your jenkins secret key} create-job "Bake LAA Influx" < location/of/repo/JenkinsMachine/jobs/Bake_LAA_Influx.xml  
+    - java -jar /location/of/jenkins-cli.jar -s http://{Instance Public DNS}:8080/ -auth admin:{your jenkins secret key} create-job "Bake LAA App" < location/of/repo/JenkinsMachine/jobs/Bake_LAA_App.xml  
+    - java -jar /location/of/jenkins-cli.jar -s http://{Instance Public DNS}:8080/ -auth admin:{your jenkins secret key} create-job "Start Influx DB" < location/of/repo/JenkinsMachine/jobs/Start_Influx_DB.xml 
+    - java -jar /location/of/jenkins-cli.jar -s http://{Instance Public DNS}:8080/ -auth admin:{your jenkins secret key} create-job "Terraform Infra UP" < location/of/repo/JenkinsMachine/jobs/Terraform_Infra_UP.xml
+
+### Running Jobs
+Run the jobs at the following order  
+Build LAA App>Bake LAA Influx AMI>Bake LAA App AMI>Terraform Infra UP>Start Influx database
+
+### Instances Running!
+Once the instances are all running, you'll need to ssh into the App Instance with the following command:  
+ssh -i "{your key}" ec2-user@{instance public dns}
+Once you're in the machine edit the *config.properties* file, overwrite the value in db.URL property with the Influxdb EC2 machine public dns and the influx port (8086).
+
+## Log Access Analytics Endpoints
+### POST /laa/ingest
+Make a POST request with the body of the log (a simple string like this: "/pets/exotic/cats/11 1037825323947 5b0193b5-b3d0-46d2-9963-437860af717f 1")
+
+### GET /laa/health
+A healthchecker endpoint, should return status 200 if everything's fine.
+
+### GET laa/metrics/{top}/{region }/{timeUnit}/{duration}
+top: as in top10, top3  
+region: aws region of the metrics  
+timeUnit: Unit of time to divide the metrics  Available timeUnits: NANOSECONDS, MICROSECONDS, MILLISECONDS, SECONDS,MINUTES, HOURS, DAYS  
+duration: ammount of time to divide the metrics  
+
+*EXAMPLE JSON RESPONSE*  
+{  
+  "topURLs": {  
+    The TOP x urls of all regions
+  },  
+  "topURLsByRegion": {  
+    The TOP x urls of the selected regions
+  },  
+  "bottomURL": {  
+    The least x accessed urls
+  },  
+  "topURLByTime": {top url divided by time (days, hours, etc)},  
+  "mostAccessedMoment": {most accessed moment in the selected time}  
+}  
